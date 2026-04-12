@@ -1,29 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
-import { Footer } from './components/layout/Footer'
-import { GithubSection } from './components/sections/GithubSection'
-import { HeroSection } from './components/sections/HeroSection'
-import { socialLinks } from './constants/socialLinks'
-import { githubFallback } from './data/fallback'
-import { useInView } from './hooks/useInView'
-import { getGitHubOverview } from './services/github'
-import type { GitHubOverview } from './types/profile'
+import { useRef } from 'react'
+import { Footer } from '@/components/layout/Footer'
+import { GithubSection } from '@/components/sections/GithubSection'
+import { HeroSection } from '@/components/sections/HeroSection'
+import { socialLinks } from '@/constants/socialLinks'
+import { useGitHubOverview } from '@/hooks/useGitHubOverview'
+import { useInView } from '@/hooks/useInView'
 
 function App() {
   const githubRef = useRef<HTMLElement>(null)
   const githubVisible = useInView(githubRef, 0.25)
-
-  const [githubData, setGithubData] = useState<GitHubOverview>(githubFallback)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function loadData() {
-      const github = await getGitHubOverview()
-      setGithubData(github)
-      setLoading(false)
-    }
-
-    void loadData()
-  }, [])
+  const { githubData, loading } = useGitHubOverview(githubVisible)
 
   return (
     <main className="bg-slate-50 text-slate-900">

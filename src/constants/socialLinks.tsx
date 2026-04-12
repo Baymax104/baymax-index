@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { BlogIcon, GitHubIcon } from '../components/icons/SocialIcons'
+import { BlogIcon, GitHubIcon } from '@/components/icons/SocialIcons'
 
 export interface SocialLink {
   name: string

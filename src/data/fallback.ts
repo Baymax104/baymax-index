@@ -1,4 +1,4 @@
-import type { GitHubOverview } from '../types/profile'
+import type { GitHubOverview } from '@/types/profile'
 
 export const githubFallback: GitHubOverview = {
   source: 'fallback',

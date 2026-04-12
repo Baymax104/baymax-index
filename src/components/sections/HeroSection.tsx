@@ -1,6 +1,6 @@
 import { ChevronUp } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import type { SocialLink } from '../../constants/socialLinks'
+import { useEffect, useRef, useState } from 'react'
+import type { SocialLink } from '@/constants/socialLinks'
 import { Typewriter } from 'react-simple-typewriter'
 
 
@@ -11,17 +11,31 @@ interface HeroSectionProps {
 
 export function HeroSection({ socialLinks }: HeroSectionProps) {
   const [scrollProgress, setScrollProgress] = useState(0)
+  const rafIdRef = useRef<number | null>(null)
 
   useEffect(() => {
-    const onScroll = () => {
+    const updateProgress = () => {
       const viewportHeight = window.innerHeight || 1
       const progress = Math.min(window.scrollY / viewportHeight, 1)
       setScrollProgress(progress)
+      rafIdRef.current = null
     }
 
-    onScroll()
+    const onScroll = () => {
+      if (rafIdRef.current !== null) {
+        return
+      }
+      rafIdRef.current = window.requestAnimationFrame(updateProgress)
+    }
+
+    updateProgress()
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (rafIdRef.current !== null) {
+        window.cancelAnimationFrame(rafIdRef.current)
+      }
+    }
   }, [])
 
   const contentOffset = -scrollProgress * 220

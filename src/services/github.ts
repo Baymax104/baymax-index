@@ -1,5 +1,5 @@
-import { githubFallback } from '../data/fallback'
-import type { GitHubOverview, GitHubProject } from '../types/profile'
+import { githubFallback } from '@/data/fallback'
+import type { GitHubOverview, GitHubProject } from '@/types/profile'
 
 const GITHUB_USERNAME = 'Baymax104'
 
