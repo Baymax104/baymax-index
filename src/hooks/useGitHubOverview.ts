@@ -4,7 +4,6 @@ import { getGitHubOverview } from '@/services/github'
 
 export function useGitHubOverview(enabled: boolean) {
   const { data, isLoading } = useSWR(enabled ? 'github-overview' : null, getGitHubOverview, {
-    fallbackData: githubFallback,
     dedupingInterval: 60_000,
   })
 
