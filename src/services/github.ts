@@ -1,5 +1,5 @@
 import { githubFallback } from '@/data/fallback'
-import type { GitHubOverview, GitHubProject } from '@/types/profile'
+import type { GitHubOverview } from '@/types/profile'
 
 const GITHUB_USERNAME = 'Baymax104'
 
@@ -48,21 +48,6 @@ function getTopLanguage(repos: GitHubRepoResponse[]) {
   return sorted[0]?.[0] ?? 'Unknown'
 }
 
-function mapProjects(repos: GitHubRepoResponse[]): GitHubProject[] {
-  return repos
-    .slice()
-    .sort((a, b) => b.stargazers_count - a.stargazers_count)
-    .slice(0, 3)
-    .map((repo) => ({
-      id: repo.id,
-      name: repo.name,
-      description: repo.description ?? '暂无项目描述',
-      language: repo.language ?? 'Unknown',
-      stars: repo.stargazers_count,
-      url: repo.html_url,
-    }))
-}
-
 async function getTotalCommits(repos: GitHubRepoResponse[]) {
   const ownRepos = repos.filter(
     (repo) => !repo.fork && repo.owner.login.toLowerCase() === GITHUB_USERNAME.toLowerCase(),
@@ -105,7 +90,7 @@ export async function getGitHubOverview(): Promise<GitHubOverview> {
         topLanguage: getTopLanguage(repos),
         totalCommits,
       },
-      projects: mapProjects(repos),
+      projects: githubFallback.projects,
     }
   } catch {
     return githubFallback

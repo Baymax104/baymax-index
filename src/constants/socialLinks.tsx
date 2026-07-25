@@ -12,13 +12,13 @@ export const socialLinks: SocialLink[] = [
   {
     name: '博客',
     href: 'https://blog.baymaxam.top',
-    color: '#4b8f8c',
+    color: '#5fb7b3',
     icon: <BlogIcon />,
   },
   {
     name: 'GitHub',
     href: 'https://github.com/Baymax104',
-    color: '#4b5563',
+    color: '#60a5fa',
     icon: <GitHubIcon />,
   },
 ]

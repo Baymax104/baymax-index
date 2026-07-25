@@ -1,4 +1,4 @@
-import { ChevronUp } from 'lucide-react'
+import { ChevronUp, MessageCircle } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { SocialLink } from '@/constants/socialLinks'
 import { Typewriter } from 'react-simple-typewriter'
@@ -7,9 +7,10 @@ import { Typewriter } from 'react-simple-typewriter'
 
 interface HeroSectionProps {
   socialLinks: SocialLink[]
+  onMessageBoardClick: () => void
 }
 
-export function HeroSection({ socialLinks }: HeroSectionProps) {
+export function HeroSection({ socialLinks, onMessageBoardClick }: HeroSectionProps) {
   const [scrollProgress, setScrollProgress] = useState(0)
   const rafIdRef = useRef<number | null>(null)
 
@@ -95,6 +96,17 @@ export function HeroSection({ socialLinks }: HeroSectionProps) {
               <span className="text-white group-hover:text-[var(--hover-color)]">{link.name}</span>
             </a>
           ))}
+          <button
+            type="button"
+            onClick={onMessageBoardClick}
+            style={{ ['--hover-color' as string]: '#fbbf24' }}
+            className="group inline-flex min-w-32 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/40 bg-black/35 px-4 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition duration-300 hover:-translate-y-0.5 hover:border-[var(--hover-color)] hover:bg-[color-mix(in_srgb,var(--hover-color)_20%,rgba(15,23,42,0.82))] hover:shadow-[0_0_14px_color-mix(in_srgb,var(--hover-color)_42%,transparent)]"
+          >
+            <span className="text-white group-hover:text-[var(--hover-color)]">
+              <MessageCircle className="h-4 w-4" />
+            </span>
+            <span className="text-white group-hover:text-[var(--hover-color)]">留言板</span>
+          </button>
         </div>
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-8 z-20 flex justify-center">

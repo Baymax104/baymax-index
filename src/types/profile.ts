@@ -7,7 +7,7 @@ export interface GitHubStats {
 }
 
 export interface GitHubProject {
-  id: number
+  id: number | string
   name: string
   description: string
   language: string

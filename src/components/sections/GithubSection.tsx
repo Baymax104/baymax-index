@@ -60,7 +60,7 @@ export function GithubSection({ sectionRef, visible, loading, githubData }: Gith
       </h3>
       <div className="mt-3 grid gap-3 md:grid-cols-3">
         {loading
-          ? Array.from({ length: 3 }, (_, index) => (
+          ? Array.from({ length: 6 }, (_, index) => (
               <Card key={`project-skeleton-${index}`} className="h-full border border-slate-200 bg-white ring-0 shadow-none">
                 <CardHeader className="pb-1">
                   <Skeleton className="h-5 w-32 bg-slate-200" />
@@ -72,9 +72,6 @@ export function GithubSection({ sectionRef, visible, loading, githubData }: Gith
                 <CardContent className="mt-auto flex items-center justify-between pt-0">
                   <Skeleton className="h-4 w-14 bg-slate-200" />
                   <Skeleton className="h-4 w-12 bg-slate-200" />
-                </CardContent>
-                <CardContent className="pt-0">
-                  <Skeleton className="h-5 w-20 rounded-full bg-slate-200" />
                 </CardContent>
               </Card>
             ))
@@ -93,11 +90,6 @@ export function GithubSection({ sectionRef, visible, loading, githubData }: Gith
                       <StarIcon />
                       {formatNumber(project.stars)}
                     </span>
-                  </CardContent>
-                  <CardContent className="pt-0">
-                    <Badge variant="outline" className="border-slate-200 text-slate-500">
-                      查看仓库
-                    </Badge>
                   </CardContent>
                 </Card>
               </a>
