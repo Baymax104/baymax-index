@@ -23,4 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-.trae
+.codegraph
+temp
+.vercel
