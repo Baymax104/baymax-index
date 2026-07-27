@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { ContentBackground } from '@/components/layout/ContentBackground'
 import { Footer } from '@/components/layout/Footer'
+import { Live2DWidget } from '@/components/live2d/Live2DWidget'
 import { AboutSection } from '@/components/sections/AboutSection'
 import { GithubSection } from '@/components/sections/GithubSection'
 import { HeroSection } from '@/components/sections/HeroSection'
@@ -51,6 +52,7 @@ function App() {
           <Footer />
         </div>
       </section>
+      <Live2DWidget />
     </main>
   )
 }
