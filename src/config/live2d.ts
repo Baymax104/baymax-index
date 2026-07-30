@@ -2,7 +2,7 @@ import type { Live2DChatRole } from '@/types/live2d'
 
 export const live2dWidgetConfig = {
   desktopMediaQuery: '(min-width: 1024px)',
-  modelPath: '/live2d/mao/Mao.model3.json',
+  modelPath: '/live2d/tororo/tororo.model3.json',
   coreScriptPath: '/vendor/live2d/live2dcubismcore.min.js',
   defaultMessages: [
     {
@@ -20,19 +20,19 @@ export const live2dWidgetConfig = {
     typingIntervalMs: 32,
   },
   canvas: {
-    width: 220,
-    height: 360,
+    width: 260,
+    height: 240,
   },
   chatPanel: {
     width: 320,
     height: 360,
-    offsetRight: 178,
-    offsetBottom: 232,
+    offsetRight: 212,
+    offsetBottom: 152,
   },
   model: {
-    scale: 0.055,
-    x: 110,
-    y: 356,
+    scale: 0.1,
+    x: 132,
+    y: 232,
     anchorX: 0.5,
     anchorY: 1,
   },

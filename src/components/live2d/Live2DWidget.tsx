@@ -265,7 +265,11 @@ export function Live2DWidget() {
   return (
     <div
       data-live2d-widget
-      className="pointer-events-none fixed right-2 bottom-0 z-50 hidden h-[360px] w-[220px] select-none lg:block xl:right-4"
+      className="pointer-events-none fixed right-2 bottom-0 z-50 hidden select-none lg:block xl:right-4"
+      style={{
+        width: live2dWidgetConfig.canvas.width,
+        height: live2dWidgetConfig.canvas.height,
+      }}
     >
       <Live2DChatPanel
         draft={draft}
