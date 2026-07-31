@@ -73,7 +73,7 @@ export function Live2DChatPanel({
       <div className="flex h-full flex-col gap-3">
         <div
           ref={messagesRef}
-          className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1"
+          className="live2d-chat-scrollbar min-h-0 flex-1 space-y-2 overflow-y-auto pr-1.5"
           data-live2d-chat-messages
         >
           {messages.map((message) => {

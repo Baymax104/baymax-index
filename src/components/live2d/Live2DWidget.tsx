@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Live2DChatPanel } from '@/components/live2d/Live2DChatPanel'
-import { getLive2DMockReply } from '@/components/live2d/live2dMockReplyProvider'
 import { live2dWidgetConfig } from '@/config/live2d'
+import { streamLive2DChat } from '@/services/llmChat'
 import type { Live2DChatMessage } from '@/types/live2d'
 
 declare global {
@@ -13,6 +13,8 @@ declare global {
 
 let cubismCorePromise: Promise<void> | null = null
 let messageIdCounter = 0
+const EMPTY_REPLY_MESSAGE = '我暂时没有生成有效回复。'
+const REPLY_ERROR_MESSAGE = '回复暂时不可用，请稍后再试。'
 
 function createMessageId() {
   messageIdCounter += 1
@@ -61,7 +63,8 @@ function loadCubismCore(src: string) {
 
 export function Live2DWidget() {
   const canvasHostRef = useRef<HTMLDivElement | null>(null)
-  const replyTimerIdsRef = useRef<number[]>([])
+  const activeReplyControllerRef = useRef<AbortController | null>(null)
+  const isMountedRef = useRef(true)
   const [draft, setDraft] = useState('')
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [isReplying, setIsReplying] = useState(false)
@@ -69,20 +72,6 @@ export function Live2DWidget() {
 
   const toggleChatPanel = useCallback(() => {
     setIsChatOpen((current) => !current)
-  }, [])
-
-  const clearReplyTimers = useCallback(() => {
-    replyTimerIdsRef.current.forEach((timerId) => window.clearTimeout(timerId))
-    replyTimerIdsRef.current = []
-  }, [])
-
-  const queueReplyTimer = useCallback((callback: () => void, delay: number) => {
-    const timerId = window.setTimeout(() => {
-      replyTimerIdsRef.current = replyTimerIdsRef.current.filter((currentId) => currentId !== timerId)
-      callback()
-    }, delay)
-
-    replyTimerIdsRef.current.push(timerId)
   }, [])
 
   const updateAssistantMessage = useCallback(
@@ -94,39 +83,99 @@ export function Live2DWidget() {
     [],
   )
 
-  const startMockReply = useCallback(
-    (assistantMessageId: string, nextMessages: Live2DChatMessage[]) => {
-      const reply = getLive2DMockReply(nextMessages)
+  const appendAssistantContent = useCallback((messageId: string, content: string) => {
+    setMessages((current) =>
+      current.map((message) =>
+        message.id === messageId
+          ? {
+              ...message,
+              content: `${message.content}${content}`,
+              status: 'typing',
+            }
+          : message,
+      ),
+    )
+  }, [])
 
-      const typeNextCharacter = (nextLength: number) => {
-        const content = reply.slice(0, nextLength)
-        const isDone = nextLength >= reply.length
+  const releaseReplyLock = useCallback(() => {
+    if (isMountedRef.current) {
+      setIsReplying(false)
+    }
+  }, [])
 
-        updateAssistantMessage(assistantMessageId, {
-          content,
-          status: isDone ? 'done' : 'typing',
-        })
+  const startLlmReply = useCallback(
+    async (assistantMessageId: string, nextMessages: Live2DChatMessage[]) => {
+      activeReplyControllerRef.current?.abort()
 
-        if (isDone) {
-          setIsReplying(false)
+      const controller = new AbortController()
+      activeReplyControllerRef.current = controller
+      let hasContent = false
+
+      try {
+        for await (const event of streamLive2DChat(nextMessages, { signal: controller.signal })) {
+          if (!isMountedRef.current || controller.signal.aborted) {
+            return
+          }
+
+          if (event.type === 'delta') {
+            hasContent = true
+            appendAssistantContent(assistantMessageId, event.content)
+            continue
+          }
+
+          if (event.type === 'error') {
+            updateAssistantMessage(assistantMessageId, {
+              content: REPLY_ERROR_MESSAGE,
+              status: 'done',
+            })
+            return
+          }
+
+          updateAssistantMessage(
+            assistantMessageId,
+            hasContent
+              ? {
+                  status: 'done',
+                }
+              : {
+                  content: EMPTY_REPLY_MESSAGE,
+                  status: 'done',
+                },
+          )
           return
         }
 
-        queueReplyTimer(
-          () => typeNextCharacter(nextLength + 1),
-          live2dWidgetConfig.replyFlow.typingIntervalMs,
-        )
-      }
+        if (isMountedRef.current && !controller.signal.aborted) {
+          updateAssistantMessage(
+            assistantMessageId,
+            hasContent
+              ? {
+                  status: 'done',
+                }
+              : {
+                  content: EMPTY_REPLY_MESSAGE,
+                  status: 'done',
+                },
+          )
+        }
+      } catch {
+        if (controller.signal.aborted) {
+          return
+        }
 
-      queueReplyTimer(() => {
         updateAssistantMessage(assistantMessageId, {
-          content: '',
-          status: 'typing',
+          content: REPLY_ERROR_MESSAGE,
+          status: 'done',
         })
-        typeNextCharacter(1)
-      }, live2dWidgetConfig.replyFlow.thinkingDelayMs)
+      } finally {
+        if (activeReplyControllerRef.current === controller) {
+          activeReplyControllerRef.current = null
+        }
+
+        releaseReplyLock()
+      }
     },
-    [queueReplyTimer, updateAssistantMessage],
+    [appendAssistantContent, releaseReplyLock, updateAssistantMessage],
   )
 
   const submitMessage = useCallback(() => {
@@ -153,10 +202,17 @@ export function Live2DWidget() {
     setMessages(nextMessages)
     setDraft('')
     setIsReplying(true)
-    startMockReply(assistantMessage.id, nextMessages)
-  }, [draft, isReplying, messages, startMockReply])
+    void startLlmReply(assistantMessage.id, nextMessages)
+  }, [draft, isReplying, messages, startLlmReply])
 
-  useEffect(() => clearReplyTimers, [clearReplyTimers])
+  useEffect(() => {
+    isMountedRef.current = true
+
+    return () => {
+      isMountedRef.current = false
+      activeReplyControllerRef.current?.abort()
+    }
+  }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined') {
