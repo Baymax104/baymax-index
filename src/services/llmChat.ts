@@ -1,4 +1,5 @@
 import type { Live2DChatMessage } from '@/types/live2d'
+import { live2dPersonaSystemPrompt } from '@/config/persona'
 
 const LLM_CHAT_ENDPOINT = import.meta.env.DEV
   ? 'https://baymax-index-api.vercel.app/api/llm/chat'
@@ -32,12 +33,20 @@ export class LlmChatError extends Error {
 }
 
 function toLlmMessages(messages: Live2DChatMessage[]): LlmChatMessage[] {
-  return messages
+  const visibleMessages = messages
     .filter((message) => message.content.trim().length > 0)
     .map((message) => ({
       role: message.role,
       content: message.content,
     }))
+
+  return [
+    {
+      role: 'system',
+      content: live2dPersonaSystemPrompt,
+    },
+    ...visibleMessages,
+  ]
 }
 
 function parseSseEvent(rawEvent: string): LlmChatStreamEvent | null {
