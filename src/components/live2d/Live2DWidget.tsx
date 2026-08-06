@@ -62,6 +62,7 @@ function loadCubismCore(src: string) {
 }
 
 export function Live2DWidget() {
+  const isChatEnabled = live2dWidgetConfig.chat.enabled
   const canvasHostRef = useRef<HTMLDivElement | null>(null)
   const activeReplyControllerRef = useRef<AbortController | null>(null)
   const isMountedRef = useRef(true)
@@ -327,24 +328,32 @@ export function Live2DWidget() {
         height: live2dWidgetConfig.canvas.height,
       }}
     >
-      <Live2DChatPanel
-        draft={draft}
-        isReplying={isReplying}
-        isOpen={isChatOpen}
-        messages={messages}
-        onDraftChange={setDraft}
-        onSubmit={submitMessage}
-      />
-      <button
-        data-live2d-character-button
-        type="button"
-        aria-label={isChatOpen ? '收起 Live2D 对话框' : '展开 Live2D 对话框'}
-        aria-pressed={isChatOpen}
-        className="pointer-events-auto h-full w-full cursor-pointer bg-transparent p-0 text-left outline-none focus-visible:ring-3 focus-visible:ring-slate-300/80"
-        onClick={toggleChatPanel}
-      >
-        <span ref={canvasHostRef} className="block h-full w-full" aria-hidden="true" />
-      </button>
+      {isChatEnabled ? (
+        <>
+          <Live2DChatPanel
+            draft={draft}
+            isReplying={isReplying}
+            isOpen={isChatOpen}
+            messages={messages}
+            onDraftChange={setDraft}
+            onSubmit={submitMessage}
+          />
+          <button
+            data-live2d-character-button
+            type="button"
+            aria-label={isChatOpen ? '收起 Live2D 对话框' : '展开 Live2D 对话框'}
+            aria-pressed={isChatOpen}
+            className="pointer-events-auto h-full w-full cursor-pointer bg-transparent p-0 text-left outline-none focus-visible:ring-3 focus-visible:ring-slate-300/80"
+            onClick={toggleChatPanel}
+          >
+            <span ref={canvasHostRef} className="block h-full w-full" aria-hidden="true" />
+          </button>
+        </>
+      ) : (
+        <div data-live2d-character className="h-full w-full" aria-hidden="true">
+          <span ref={canvasHostRef} className="block h-full w-full" />
+        </div>
+      )}
     </div>
   )
 }

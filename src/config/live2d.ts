@@ -4,6 +4,9 @@ export const live2dWidgetConfig = {
   desktopMediaQuery: '(min-width: 1024px)',
   modelPath: '/live2d/tororo/tororo.model3.json',
   coreScriptPath: '/vendor/live2d/live2dcubismcore.min.js',
+  chat: {
+    enabled: false,
+  },
   defaultMessages: [
     {
       role: 'assistant' satisfies Live2DChatRole,
