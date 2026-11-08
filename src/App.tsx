@@ -1,24 +1,18 @@
 import { useRef } from 'react'
 import { ContentBackground } from '@/components/layout/ContentBackground'
 import { Footer } from '@/components/layout/Footer'
-import { Live2DWidget } from '@/components/live2d/Live2DWidget'
 import { AboutSection } from '@/components/sections/AboutSection'
-import { GithubSection } from '@/components/sections/GithubSection'
 import { HeroSection } from '@/components/sections/HeroSection'
 import { MessageBoardSection } from '@/components/sections/MessageBoardSection'
 import { socialLinks } from '@/constants/socialLinks'
-import { useGitHubOverview } from '@/hooks/useGitHubOverview'
 import { useInView } from '@/hooks/useInView'
 
 function App() {
   const aboutRef = useRef<HTMLElement>(null)
-  const githubRef = useRef<HTMLElement>(null)
   const messageRef = useRef<HTMLElement>(null)
   const messageBoardElementRef = useRef<HTMLDivElement | null>(null)
   const aboutVisible = useInView(aboutRef, 0.2)
-  const githubVisible = useInView(githubRef, 0.25)
   const messageVisible = useInView(messageRef, 0.2)
-  const { githubData, loading } = useGitHubOverview(githubVisible)
 
   return (
     <main className="bg-slate-50 text-slate-900">
@@ -34,12 +28,6 @@ function App() {
         <ContentBackground />
         <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 pb-14 sm:px-6">
           <AboutSection sectionRef={aboutRef} visible={aboutVisible} />
-          <GithubSection
-            sectionRef={githubRef}
-            visible={githubVisible}
-            loading={loading}
-            githubData={githubData}
-          />
           <MessageBoardSection
             sectionRef={messageRef}
             visible={messageVisible}
@@ -52,7 +40,6 @@ function App() {
           <Footer />
         </div>
       </section>
-      <Live2DWidget />
     </main>
   )
 }
